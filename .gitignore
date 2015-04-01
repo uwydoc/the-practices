@@ -1,0 +1,50 @@
+# Vim temps/backups/swaps/sessions
+*~
+*.swp
+Session.vim
+
+# Emacs temps/backups/sessions
+\#*\#
+~*
+.emacs.*
+
+# Sublime workspace/project
+*.sublime-project
+*.sublime-workspace
+
+# CMake temps
+run-cmake
+build
+install
+
+# VC temps
+*.pdb
+*.sdf
+*.suo
+*.sln
+*.vcxproj*
+*.vcproj*
+# Output dir for msbuild/nmake/make
+debug
+Debug
+release
+Release
+
+# Submodules, to avoid accidental commit
+.gitmodules
+
+# Runtime environment
+runtime
+
+# Other temp/misc. files
+*.log
+*.bak
+
+# Qt Creator temp/user-specific
+*.pro.user
+*.pro.user.*
+build-*Qt*
+
+# Custom
+*.lib
+*.exe
