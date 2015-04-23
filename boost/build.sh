@@ -12,7 +12,7 @@ BOOST_LIBRARYDIR=/d/Downloads/boost-build-1_55_0/mingw/stage/lib
 ls $@ | while read filename; do
     outfile=${filename%.*};
     rm -f runtime/$outfile;
-    $CC $CFLAGS $CXXFLAGS -I "$BOOST_ROOT" -L "$BOOST_LIBRARYDIR" -o runtime/$outfile $filename $LFLAGS || break;
+    $CC $CFLAGS $CXXFLAGS -I "$BOOST_ROOT" -L "$BOOST_LIBRARYDIR" -o runtime/$outfile $filename $LDFLAGS || break;
 done
 
 # run
