@@ -1,0 +1,8 @@
+22 serialization::archive 10 1 1
+0 0 5 snake 0
+1 2 3 ape
+2 4 5 mouse 0 0 0
+3 8 7 octopus 1 0
+4
+5 2 7 penguin 0 0
+6 2 7 sparrow 0 0 3 3 5 7 2 4 6
