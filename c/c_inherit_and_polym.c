@@ -72,6 +72,8 @@ int main(int argc, char* argv[])
     bp->greet(bp, "lei");
     bird_p->singit(bird_p);
     bp->free(bp);
+
+    return 0;
 }
 
 // Impl.
