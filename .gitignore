@@ -1,3 +1,11 @@
+# Special
+*/*
+!boost/*
+!c/*
+!cpp/*
+!cpp/*/*
+!qt/qmlsamegame/*
+
 # Vim temps/backups/swaps/sessions
 *~
 *.swp
