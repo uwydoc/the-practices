@@ -82,8 +82,11 @@ function handleClick(x, y)
     var row = Math.floor(y / gameCanvas.blockSize);
     var column = Math.floor(x / gameCanvas.blockSize);
     if (isValidBlock(row, column)) {
-        gameCanvas.score += removeSame(row, column);
-        score.text = "Score: " + gameCanvas.score;
+        var score1 = removeSame(row, column);
+        if (score1 > 0) {
+            gameCanvas.score += score1;
+            score.text = "Score: " + gameCanvas.score;
+        }
     }
 }
 
@@ -129,63 +132,104 @@ function swapBlock(fromRow, fromCol, toRow, toCol)
     return true;
 }
 
+function arrayIndexOf(arr, val, f)
+{
+    f = f || function(a, b) { return (a == b); };
+    for (var i = 0, l = arr.length; i < l; i++) {
+        if (f(arr[i], val))
+            return i;
+    }
+    return -1;
+}
+
+function sameBlocks(row, column)
+{
+    if (!isValidBlock(row, column))
+        return [];
+
+    var todo = [ [row, column] ];
+    var done = [];
+    var eq = function(a, b) { return (a[0] == b[0] && a[1] == b[1]); };
+    while (todo.length > 0) {
+        var item = todo.shift();
+        if (arrayIndexOf(done, item, eq) != -1)
+            continue;
+        var r = item[0];
+        var c = item[1];
+        var t = blocks[indexOf(r, c)].type;
+        var candidates = [ [r+1, c], [r-1, c], [r, c+1], [r, c-1] ];
+        candidates.forEach(function(e) {
+            if (isValidBlock(e[0], e[1])
+                    && arrayIndexOf(done, e, eq) == -1
+                    && arrayIndexOf(todo, e, eq) == -1
+                    && blocks[indexOf(e[0], e[1])].type == t) {
+                todo.push(e);
+            }
+        });
+        done.push(item);
+    }
+    return done;
+}
+
 function removeSame(row, column)
 {
     if (!isValidBlock(row, column))
         return 0;
 
-    var score = 0;
     // remove same connected blocks
-    var todo = [ [row,column] ];
-    var done = [];
-    var combo = 1;
-    while (todo.length > 0) {
-        var item = todo.shift();
-        var r = item[0];
-        var c = item[1];
-        var i = indexOf(r, c);
-        if (done.indexOf(item) == -1) {
-            if (blocks[i] != null) {
-                var candidates = [ [r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1] ];
-                candidates.forEach(function(e) {
-                    //console.log("candidate: " + e);
-                    if (isValidBlock(e[0], e[1])
-                        && blocks[indexOf(e[0], e[1])].type == blocks[i].type)
-                        todo.push(e);
-                });
-                score += combo;
-                combo++;
-                // remove the item
-                blocks[i].dying = true;
-                blocks[i].destroy();
-                blocks[i] = null;
+    var same = sameBlocks(row, column);
+    var combo = same.length - 2;
+    if (combo < 1)
+        return 0;
+
+    same.forEach(function(e) {
+        var i = indexOf(e[0], e[1]);
+        blocks[i].dying = true;
+        blocks[i].destroy(200);
+        blocks[i] = null;
+    });
+    var score = combo * combo;
+    console.log("combo: " + combo + ", score: " + score);
+
+    // flood fill removed blocks (down)
+    for (var column = 0; column < maxColumns; ++column) {
+        var m = maxRows - 1;
+        var n = m;
+        while (n >= 0) {
+            while (m >= 0 && isValidBlock(m, column))
+                m--;
+            n = m - 1;
+            while (n >= 0 && !isValidBlock(n, column))
+                n--;
+            var dist = 1;
+            while (n-dist >= 0 && isValidBlock(n-dist, column))
+                dist++;
+            while (n >= 0 && dist--) {
+                swapBlock(m, column, n, column);
+                m--;
+                n--;
             }
-            done.push(item);
         }
     }
-    // flood fill removed blocks
-    for (var column = 0; column < maxColumns; ++column) {
-        var f = 0;
-        while (f < maxRows && !isValidBlock(f, column))
-            f++;
-        var m = f;
+    // flood fill removed blocks (left)
+    for (var row = 0; row < maxRows; ++row) {
+        var m = 0;
         var n = m;
-        do {
-            m = n;
-            while (m < maxRows && isValidBlock(m, column))
+        while (n < maxColumns) {
+            while (m < maxColumns && isValidBlock(row, m))
                 m++;
-            n = m;
-            while (n < maxRows && !isValidBlock(n, column))
+            n = m + 1;
+            while (n < maxColumns && !isValidBlock(row, n))
                 n++;
-            var i = m - 1;
-            var j = n - 1;
-            //console.log("f: " + f + ", m: " + m + ", n: " + n);
-            while (i >= f) {
-                swapBlock(i, column, j, column);
-                i--;
-                j--;
+            var dist = 1;
+            while (n+dist < maxColumns && isValidBlock(row, n+dist))
+                dist++;
+            while (n < maxColumns && dist--) {
+                swapBlock(row, m, row, n);
+                m++;
+                n++;
             }
-        } while (m > 0 && m < n && n <= maxRows);
+        }
     }
 
     return score;
