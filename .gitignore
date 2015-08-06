@@ -5,6 +5,7 @@
 !cpp/*
 !cpp/*/*
 !qt/qmlsamegame/*
+!go/*
 
 # Vim temps/backups/swaps/sessions
 *~
