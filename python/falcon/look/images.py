@@ -22,12 +22,25 @@ def _ext_to_media_type(ext):
 def _generate_id():
     return str(uuid.uuid4())
 
+# Hooks
+ALLOWED_MEDIA_TYPES = [
+    'image/jpeg',
+    'image/gif',
+    'image/png'
+]
 
+def validate_media_type(req, resp, params):
+    if req.content_type not in ALLOWED_MEDIA_TYPES:
+        description = 'Image type not allowed. Must be PNG, JPEG, or GIF'
+        raise falcon.HTTPBadRequest('Bad request', description)
+
+# Resources
 class Collection(object):
 
     def __init__(self, storage_path):
         self.storage_path = storage_path
 
+    @falcon.before(validate_media_type)
     def on_post(self, req, resp):
         image_id = _generate_id()
         ext = _media_type_to_ext(req.content_type)
