@@ -1,32 +1,15 @@
 package main
 
 import (
-	_ "."
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
 )
-
-func testHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("OK"))
-}
-
-func writeRules(rules []*Rule) string {
-	f, err := ioutil.TempFile("", "sf-rules")
-	if err != nil {
-		log.Fatalln(err)
-		return ""
-	}
-	defer f.Close()
-	json.NewEncoder(f).Encode(rules)
-	return f.Name()
-}
 
 func TestServer(t *testing.T) {
 	dummy := httptest.NewServer(http.HandlerFunc(testHandler))
@@ -67,4 +50,21 @@ func TestServer(t *testing.T) {
 			t.Errorf("%s: body = %q, want %q", test.url, g, w)
 		}
 	}
+}
+
+func testHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("OK"))
+}
+
+func writeRules(rules []*Rule) string {
+	f, err := ioutil.TempFile("", "sf-rules")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	err = json.NewEncoder(f).Encode(rules)
+	if err != nil {
+		panic(err)
+	}
+	return f.Name()
 }
