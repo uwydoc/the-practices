@@ -66,7 +66,7 @@ func (s *Server) handler(req *http.Request) http.Handler {
 	defer s.mu.RUnlock()
 	for _, r := range s.rules {
 		if r.Match(req) {
-			r.Handler()
+			return r.Handler()
 		}
 	}
 	return nil
