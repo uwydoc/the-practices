@@ -33,7 +33,7 @@ func TestServer(t *testing.T) {
 	}{
 		{"http://example.com/", 200, "OK"},
 		{"http://foo.example.com/", 200, "OK"},
-		{"http://example.org/", 200, "contents of index.html\n"},
+		{"http://example.org/", 200, "welcome to testdata\n"},
 		{"http://example.net/", 404, "Not found.\n"},
 		{"http://fooexample.com/", 404, "Not found.\n"},
 	}
