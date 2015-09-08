@@ -105,13 +105,24 @@ using __tuple_cat_ret_t = typelist_apply_t<
         typelist_cat_t<typelist<as_typelist_t<Tuples>...> > >;
 
 template<typename... Tuples>
-auto tuple_cat(Tuples&&... tpls) -> __tuple_cat_ret_t<Tuples...>;
+struct __tuple_cat_fn
+{
+    auto operator()(Tuples&&... tpls) -> __tuple_cat_ret_t<Tuples...>;
+};
 
 template<typename... Ts, typename... Rem>
-auto tuple_cat<std::tuple<Ts...>, Rem...>(std::tuple<Ts...>&& t1, Rem&&... rem)
-    -> __tuple_cat_ret_t<std::tuple<Ts...>, Rem...>
+struct __tuple_cat_fn<std::tuple<Ts...>, Rem...>
 {
-    //
+    auto operator()(std::tuple<Ts...>&& t1, Rem&&... rem) -> __tuple_cat_ret_t<std::tuple<Ts...>, Rem...>
+    {
+        //
+    }
+};
+
+template<typename... Tuples>
+auto tuple_cat(Tuples&&... tpls) -> __tuple_cat_ret_t<Tuples...>
+{
+    return __tuple_cat_fn<Tuples...>()(std::move(tpls)...);
 }
 
 // main
@@ -122,4 +133,6 @@ int main()
     typedef std::tuple<float, double> tuple2_t;
     as_typelist_t<tuple2_t> t2;
     typelist_cat_t<as_typelist_t<tuple1_t>, as_typelist_t<tuple2_t> > t3;
+
+    ::tuple_cat(tuple1_t{1,'a',"hello"});
 }
